@@ -63,7 +63,6 @@ def new_client_prompt():
         print("This Client already exists")
     else:
         client_instance.save()
-        print(f"New Client added with ID: {client_instance.client_id}, Name: {client_instance.client_name}")
         if materials_provided == 'TRUE':
             status, current_timestamp, checked = new_tax_prompt()
             print(f"status={status}, timestamp={current_timestamp}, checked={checked}, client_id={client_instance.client_id}")
@@ -86,13 +85,26 @@ def new_tax_prompt():
     return status, current_timestamp, checked
 
 
+def update_client_prompt():
+    input_id = input("What is the client's ID?" )
+    client_id = Client.normalize(input_id)
+    client_instance = Client(client_id)
+    if client_instance.exists():
+        update_choice = input('Has the client provided all necessary tax material?(True/False) ')
+        choice = Client.convert(update_choice)
+        if choice == 'True':
+            client_instance.update()
+            print('Client Updated')
+    else:
+        print('Client does not exist')
+
 
 
 MENU_OPTIONS = {
     '1': new_cpa_prompt,
     '2': new_assistants_prompt,
     '3': new_client_prompt,
-    '4': 'Update Provided Material Status',
+    '4': update_client_prompt,
     '5': 'Check Provided Material Status',
     '6': 'Change filing status',
     '7': 'Check filing status',
