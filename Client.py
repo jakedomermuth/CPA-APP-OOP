@@ -21,6 +21,9 @@ class Client:
             client_name = database.client_exists(connection, self.client_name)
             return client_name is not None
 
+    def update(self):
+        with get_connection() as connection:
+            database.update_material_status(connection, self.client_id)
 
     @staticmethod
     def normalize(name: str, address: str, materials_provided: str):
