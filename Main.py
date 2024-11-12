@@ -16,6 +16,7 @@ MENU_PROMPT = """
     7: Check filing status
     8: Update CPA checked Return
     9: Check if CPA checked return
+    10: Exit
     Select an Option: """
 
 
@@ -65,7 +66,6 @@ def new_client_prompt():
         client_instance.save()
         if materials_provided == 'TRUE':
             status, current_timestamp, checked = new_tax_prompt()
-            print(f"status={status}, timestamp={current_timestamp}, checked={checked}, client_id={client_instance.client_id}")
 
             tax_instance = Taxes(status, current_timestamp, checked, client_instance.client_id)
             tax_instance.save()
@@ -85,19 +85,33 @@ def new_tax_prompt():
     return status, current_timestamp, checked
 
 
-def update_client_prompt():
-    input_id = input("What is the client's ID?" )
-    client_id = Client.normalize(input_id)
-    client_instance = Client(client_id)
-    if client_instance.exists():
-        update_choice = input('Has the client provided all necessary tax material?(True/False) ')
-        choice = Client.convert(update_choice)
-        if choice == 'True':
-            client_instance.update()
-            print('Client Updated')
-    else:
-        print('Client does not exist')
 
+def update_client_prompt():
+    input_id = input("What is the client's ID? ")
+    client_id = Client.convert(input_id)
+
+    client_instance = Client.get(client_id)
+    if client_instance.exists():
+        print(client_instance)
+        update_choice = input('Has the client provided all necessary tax material?(True/False) ')
+        choice = Client.upper(update_choice)
+        if choice == 'TRUE':
+            client_instance.update()
+            print('Clients material status has been updated')
+            status, current_timestamp, checked = new_tax_prompt() # Once materials are provided, tax return info is immediatly taken
+
+            tax_instance = Taxes(status, current_timestamp, checked, client_instance.client_id)
+            tax_instance.save() # creating instance and saving tax info
+    else:
+        print(f'A client with the ID {client_id} does not exist')
+
+
+def check_material_status():
+    input_id = input("What is the client's ID? ")
+    client_id = Client.convert(input_id)
+
+    client_instance = Client.get(client_id)
+    print(client_instance)
 
 
 MENU_OPTIONS = {
@@ -105,7 +119,7 @@ MENU_OPTIONS = {
     '2': new_assistants_prompt,
     '3': new_client_prompt,
     '4': update_client_prompt,
-    '5': 'Check Provided Material Status',
+    '5': check_material_status,
     '6': 'Change filing status',
     '7': 'Check filing status',
     '8': 'Update CPA checked Return',
