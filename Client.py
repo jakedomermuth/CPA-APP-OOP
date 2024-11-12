@@ -11,6 +11,8 @@ class Client:
         self.cpa_id = cpa_id
         self.client_id = client_id
 
+    def __str__(self):
+        return f"Client Name: {self.client_name} | Materials Provided: {self.materials_provided} | Cpa's ID Number: {self.cpa_id}"
 
     def save(self):
         with get_connection() as connection:
@@ -30,9 +32,19 @@ class Client:
         return name.upper(), address.upper(), materials_provided.upper()
 
     @staticmethod
+    def upper(string: str):
+        return string.upper()
+
+    @staticmethod
     def convert(num_input: str) -> int:
         try:
             num = int(num_input)
             return num
         except ValueError:
             print('The number must be an integer!')
+
+    @classmethod
+    def get(cls, client_id: int):
+        with get_connection() as connection:
+            client = database.get_client(connection, client_id)
+            return cls(client[1], client[2], client[3], client[4], client[5], client[0])
