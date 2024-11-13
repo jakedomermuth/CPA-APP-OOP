@@ -9,19 +9,38 @@ class Taxes:
         self.checked = checked
         self.client_id = client_id
 
+    def __str__(self):
+        # status, timestamp, checked, client_id
+        return f"Filling Status: {self.status} | Filing Start Date: {self.current_timestamp} | Checked By CPA: {self.checked} Client ID: {self.client_id}"
+
     def save(self):
         with get_connection() as connection:
-            print(f"status: {self.status}, filed_timestamp: {self.current_timestamp}, checked: {self.checked}, client_id: {self.client_id}")
             database.add_taxes(connection, self.status, self.current_timestamp, self.checked, self.client_id)
 
-    @staticmethod
-    def normalize(name: str):
-        return name.upper()
+    def update(self):
+        with get_connection() as connection:
+            database.update_filing_status(connection, self.tax_id)
+
+    def check(self):
+        with get_connection() as connection:
+            database.update_checked_status(connection, self.tax_id)
+
+    @classmethod
+    def get(cls, tax_id: int):
+        with get_connection() as connection:
+            taxes = database.get_taxes(connection, tax_id)
+            if taxes is None:
+                return None
+            return cls(taxes[1], taxes[2], taxes[3], taxes[4])
 
     @staticmethod
-    def convert(client_id: str) -> int:
+    def normalize(string: str):
+        return string.upper()
+
+    @staticmethod
+    def convert(_id: str) -> int:
         try:
-            client_id = int(client_id)
-            return client_id
+            _id = int(_id)
+            return _id
         except ValueError:
             print('The ID must be an integer!')
