@@ -47,4 +47,6 @@ class Client:
     def get(cls, client_id: int):
         with get_connection() as connection:
             client = database.get_client(connection, client_id)
+            if client is None:
+                return None
             return cls(client[1], client[2], client[3], client[4], client[5], client[0])
