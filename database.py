@@ -135,6 +135,7 @@ def update_checked_status(connection, tax_id: int):
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(UPDATE_CHECKED_STATUS, (tax_id, ))
+            print(f"Rows affected: {cursor.rowcount}")
 
 
 #selecting functions
