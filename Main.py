@@ -128,7 +128,7 @@ def get_taxes():
         print(tax_instance)
 
 
-def update_filing_status(): # change timestamp and get to update !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+def update_filing_status():
     input_id = input('What is the Tax ID you would like to check? ')
     tax_id = Taxes.convert(input_id)
 
@@ -156,7 +156,7 @@ def cpa_check_update(): # update doesnt work? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             choice_input = input('Has the tax return been checked by a CPA?(True/False) ')
             choice = Taxes.normalize(choice_input)
             if choice == 'TRUE':
-                tax_instance.check() # NOT working but no error
+                tax_instance.check()  # NOT working but no error
                 print('Tax return has been updated to checked')
         else:
             print('This tax return has not been filed yet')
