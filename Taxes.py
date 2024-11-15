@@ -1,52 +1,47 @@
 import database
 from connections import get_connection
+import datetime
 
-
-class Client:
-    def __init__(self, client_name: str, client_address: str, client_income: int, materials_provided: str, cpa_id: int, client_id=None):
-        self.client_name = client_name
-        self.client_address = client_address
-        self.client_income = client_income
-        self.materials_provided = materials_provided
-        self.cpa_id = cpa_id
+class Taxes:
+    def __init__(self, status: str, current_timestamp: float, checked: str, client_id: int, tax_id = None):
+        self.tax_id = tax_id
+        self.status = status
+        self.current_timestamp = current_timestamp
+        self.checked = checked
         self.client_id = client_id
 
     def __str__(self):
-        return f"Client Name: {self.client_name} | Materials Provided: {self.materials_provided} | Cpa's ID Number: {self.cpa_id}"
+        niave_datetime = datetime.datetime.utcfromtimestamp(self.current_timestamp)
+        return f"Filling Status: {self.status} | Filing Start Date: {niave_datetime} | Checked By CPA: {self.checked} | Client ID: {self.client_id}"
 
     def save(self):
         with get_connection() as connection:
-            self.client_id = database.add_clients(connection, self.client_name, self.client_address, self.client_income, self.materials_provided, self.cpa_id)
-
-    def exists(self):
-        with get_connection() as connection:
-            client_name = database.client_exists(connection, self.client_name)
-            return client_name is not None
+            database.add_taxes(connection, self.status, self.current_timestamp, self.checked, self.client_id)
 
     def update(self):
         with get_connection() as connection:
-            database.update_material_status(connection, self.client_id)
+            database.update_filing_status(connection, self.tax_id)
+
+    def check(self):
+        with get_connection() as connection:
+            database.update_checked_status(connection, self.tax_id)
+
+    @classmethod
+    def get(cls, tax_id: int):
+        with get_connection() as connection:
+            taxes = database.get_taxes(connection, tax_id)
+            if taxes is None:
+                return None
+            return cls(taxes[1], taxes[2], taxes[3], taxes[4], taxes[0])
 
     @staticmethod
-    def normalize(name: str, address: str, materials_provided: str):
-        return name.upper(), address.upper(), materials_provided.upper()
-
-    @staticmethod
-    def upper(string: str):
+    def normalize(string: str):
         return string.upper()
 
     @staticmethod
-    def convert(num_input: str) -> int:
+    def convert(_id: str) -> int:
         try:
-            num = int(num_input)
-            return num
+            _id = int(_id)
+            return _id
         except ValueError:
-            print('The number must be an integer!')
-
-    @classmethod
-    def get(cls, client_id: int):
-        with get_connection() as connection:
-            client = database.get_client(connection, client_id)
-            if client is None:
-                return None
-            return cls(client[1], client[2], client[3], client[4], client[5], client[0])
+            print('The ID must be an integer!')
