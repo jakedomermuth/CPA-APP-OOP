@@ -1,5 +1,6 @@
 # CPA-APP-OOP
 
+## This project was built using object oriented design principles
 You will build a client/tax return system for a small accounting firm. Your customer (the accounting firm)
 requires the following from your application: <br>
 • You must store the following information: <br>
